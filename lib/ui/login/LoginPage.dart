@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttercmcanyin/bean/BaseBean.dart';
 import 'package:fluttercmcanyin/common/Constants.dart';
 import 'package:fluttercmcanyin/http/HttpUtil.dart';
+import 'package:fluttercmcanyin/weight/CommonTextField.dart';
 import 'package:toast/toast.dart';
 
 // ignore: must_be_immutable
@@ -48,46 +52,18 @@ class _LoginPageState extends State<LoginPage> {
                   padding: EdgeInsets.only(top: 8),
                 ),
                 Padding(
-                  child: TextField(
-                    autofocus: true,
-                    onChanged: (text) {
-                      isEnable = text.trim().length == 11;
-                      setState(() {});
-                    },
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    maxLength: 11,
-
-                    decoration: InputDecoration(
-                      counterText: "",
-                        hintText: "请输入手机号",
-                        prefixIcon: Icon(Icons.phone_android),
-                        suffixIcon: Offstage(
-                          child: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              _phoneController.clear();
-                            },
-                          ),
-                          offstage: _phoneController.text.trim().length == 0,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          //未选中时候的颜色
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(
-                            color: Color(0xffe5e5e5),
-                          ),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          //选中时外边框颜色
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(
-                            color: Color(0xffe5e5e5),
-                          ),
-                        ),
-                        hintStyle:
-                            TextStyle(color: Color(0xffcccccc), fontSize: 16)),
-                  ),
+                  child:
+                      UnderlineTextField("请输入手机号", _phoneController, (value) {},
+                          prefixIcon: Icon(Icons.phone_android),
+                          suffixIcon: Offstage(
+                            child: IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _phoneController.clear();
+                              },
+                            ),
+                            offstage: _phoneController.text.trim().length == 0,
+                          )),
                   padding: EdgeInsets.only(top: 20, left: 22, right: 22),
                 ),
                 Padding(
@@ -116,8 +92,10 @@ class _LoginPageState extends State<LoginPage> {
                         Toast.show("手机号不能少于11位", context);
                         return;
                       }
-                      var response = await HttpUtil().get("http://www.baidu.com");
-                      print(response.toString());
+                      var baseBean = BaseBean.fromJson(jsonDecode(
+                          await HttpUtil().post("user/sendsms",
+                              data: {"mobile": "17610123767"})));
+                      Toast.show(baseBean.msg, context);
                     },
                   ),
                   padding: EdgeInsets.only(left: 22, top: 40, right: 22),

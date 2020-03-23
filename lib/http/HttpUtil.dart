@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:simple_rc4/simple_rc4.dart';
 
 class HttpUtil {
   static HttpUtil instance;
@@ -19,29 +22,37 @@ class HttpUtil {
     //BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
     options = new BaseOptions(
       //请求基地址,可以包含子路径
-      baseUrl: "http://www.google.com",
+      baseUrl: "https://yp-app.triumen.cn/",
       //连接服务器超时时间，单位是毫秒.
       connectTimeout: 10000,
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
       receiveTimeout: 5000,
       sendTimeout: 5000,
-      //Http请求头.
-      headers: {
-        //do something
-        "version": "1.0.0"
-      },
+//      //Http请求头.
+//      headers: {
+//        //do something
+//        "version": "1.0.0"
+//      },
       //请求的Content-Type，默认值是"application/json; charset=utf-8",Headers.formUrlEncodedContentType会自动编码请求体.
-      contentType: Headers.formUrlEncodedContentType,
+      contentType: Headers.jsonContentType,
       //表示期望以那种格式(方式)接受响应数据。接受4种类型 `json`, `stream`, `plain`, `bytes`. 默认值是 `json`,
-      responseType: ResponseType.json,
+      responseType: ResponseType.plain,
     );
 
     dio = new Dio(options);
     //添加拦截器
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
-      print("请求之前");
-      // Do something before request is sent
+      options.queryParameters.addAll({
+        "voice": "false",
+        "app_plat": "android",
+        "mobile_model": "android9",
+        "version": "1.2.2",
+        "token": ""
+      });
+
+      options.data = jsonEncode(options.queryParameters);
+      print("dio--queryParameters--=${jsonEncode(options.queryParameters)}");
       return options; //continue
     }, onResponse: (Response response) {
       print("响应之前");
@@ -76,10 +87,10 @@ class HttpUtil {
   /*
    * get请求
    */
-  get(url, {data, options, cancelToken}) async {
+  get(path, {data, options, cancelToken}) async {
     Response response;
     try {
-      response = await dio.get(url,
+      response = await dio.get(path,
           queryParameters: data, options: options, cancelToken: cancelToken);
       print('get success---------${response.statusCode}');
       print('get success---------${response.data}');
@@ -99,12 +110,15 @@ class HttpUtil {
   /*
    * post请求
    */
-  post(url, {data, options, cancelToken}) async {
+  post(path, {data, options, cancelToken}) async {
     Response response;
     try {
-      response = await dio.post(url,
+      response = await dio.post(path,
           queryParameters: data, options: options, cancelToken: cancelToken);
-      print('post success---------${response.data}');
+      //解密参数
+//      var decodeString = RC4("2*s&3Hd#kd90").decodeString(response.data, true);
+      print("dio--decodeString--=${response.data}");
+      return response.data;
     } on DioError catch (e) {
       print('post error---------$e');
       formatError(e);
