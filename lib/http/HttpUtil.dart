@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:fluttercmcanyin/bean/BaseBean.dart';
+import 'package:fluttercmcanyin/http/API.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
 class HttpUtil {
@@ -22,7 +24,7 @@ class HttpUtil {
     //BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
     options = new BaseOptions(
       //请求基地址,可以包含子路径
-      baseUrl: "https://yp-app.triumen.cn/",
+      baseUrl: API.BASE_URL,
       //连接服务器超时时间，单位是毫秒.
       connectTimeout: 10000,
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
@@ -110,7 +112,7 @@ class HttpUtil {
   /*
    * post请求
    */
-  post(path, {data, options, cancelToken}) async {
+  Future<BaseBean<T>> post<T>(path, {data, options, cancelToken}) async {
     Response response;
     try {
       response = await dio.post(path,
@@ -118,12 +120,14 @@ class HttpUtil {
       //解密参数
 //      var decodeString = RC4("2*s&3Hd#kd90").decodeString(response.data, true);
       print("dio--decodeString--=${response.data}");
-      return response.data;
+      var baseBean = BaseBean<T>.fromJson(jsonDecode(response.data));
+
+      return baseBean;
     } on DioError catch (e) {
       print('post error---------$e');
       formatError(e);
     }
-    return response.data;
+    return null;
   }
 
   /*

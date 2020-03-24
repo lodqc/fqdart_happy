@@ -1,8 +1,8 @@
-class BaseBean {
+class BaseBean<T> {
   bool result;
   int code;
   String msg;
-  String data;
+  T data;
 
   BaseBean({this.result, this.code, this.msg, this.data});
 
