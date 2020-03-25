@@ -26,8 +26,8 @@ void main() {
   runApp(MaterialApp(
     title: 'FishDemo',
     theme: ThemeData(
-        brightness: Brightness.light,
         primaryColor: Colors.white,
+        backgroundColor: Colors.white,
         appBarTheme: new AppBarTheme(elevation: 0),
         platform: TargetPlatform.iOS),
     home: routes.buildPage('login_page', null), //把他作为默认页面
