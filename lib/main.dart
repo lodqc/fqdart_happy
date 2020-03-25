@@ -4,6 +4,7 @@ import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercmcanyin/login/boss/LoginBossPage.dart';
+import 'package:fluttercmcanyin/login/boss/LoginVerificationCodePage.dart';
 import 'package:fluttercmcanyin/login/page.dart';
 
 void main() {
@@ -11,6 +12,7 @@ void main() {
       PageRoutes(pages: <String, Page<Object, dynamic>>{
     'login_page': LoginPage(), //在这里添加页面
     'login_boss_page': LoginBossPage(), //在这里添加页面
+    'login_verificationcode_page': LoginVerificationCodePage(), //在这里添加页面
   });
 
   if (Platform.isAndroid) {

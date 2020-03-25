@@ -44,7 +44,7 @@ Widget buildView(LoginState state, Dispatch dispatch, ViewService viewService) {
               margin: EdgeInsets.only(left: 13, right: 13),
             ),
             onTap: () {
-              dispatch(LoginActionCreator.openLogin());
+              dispatch(LoginActionCreator.onRefrsh());
             },
           ),
         ],

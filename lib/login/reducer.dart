@@ -1,17 +1,16 @@
 import 'package:fish_redux/fish_redux.dart';
-
-import 'action.dart';
-import 'state.dart';
+import 'package:fluttercmcanyin/login/action.dart';
+import 'package:fluttercmcanyin/login/state.dart';
 
 Reducer<LoginState> buildReducer() {
   return asReducer(
     <Object, Reducer<LoginState>>{
-      LoginAction.action: _onAction,
+      LoginAction.onRefrsh: _onRefrsh,
     },
   );
 }
 
-LoginState _onAction(LoginState state, Action action) {
-  final LoginState newState = state.clone();
+LoginState _onRefrsh(LoginState state, Action action) {
+  final LoginState newState = state.clone()..isEnable = state.phoneController.text.length == 11;
   return newState;
 }
