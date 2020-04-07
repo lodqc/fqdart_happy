@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:fluttercmcanyin/bean/BaseBean.dart';
+import 'package:fluttercmcanyin/generated/json/base/json_convert_content.dart';
 import 'package:fluttercmcanyin/http/API.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 
@@ -112,7 +112,7 @@ class HttpUtil {
   /*
    * post请求
    */
-  Future<BaseBean<T>> post<T>(path, {data, options, cancelToken}) async {
+  Future<T> post<T>(path, {data, options, cancelToken}) async {
     Response response;
     try {
       response = await dio.post(path,
@@ -120,7 +120,7 @@ class HttpUtil {
       //解密参数
 //      var decodeString = RC4("2*s&3Hd#kd90").decodeString(response.data, true);
       print("dio--decodeString--=${response.data}");
-      var baseBean = BaseBean<T>.fromJson(jsonDecode(response.data));
+      var baseBean = JsonConvert.fromJsonAsT<T>(json.decode(response.data));
 
       return baseBean;
     } on DioError catch (e) {

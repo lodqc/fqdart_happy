@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercmcanyin/home/HomePage.dart';
 import 'package:fluttercmcanyin/login/boss/LoginBossPage.dart';
 import 'package:fluttercmcanyin/login/boss/LoginVerificationCodePage.dart';
 import 'package:fluttercmcanyin/login/page.dart';
@@ -13,6 +14,7 @@ void main() {
     'login_page': LoginPage(), //在这里添加页面
     'login_boss_page': LoginBossPage(), //在这里添加页面
     'login_verificationcode_page': LoginVerificationCodePage(), //在这里添加页面
+    'home_page': HomePage(), //在这里添加页面
   });
 
   if (Platform.isAndroid) {
@@ -27,7 +29,6 @@ void main() {
     title: 'FishDemo',
     theme: ThemeData(
         primaryColor: Colors.white,
-        backgroundColor: Colors.white,
         appBarTheme: new AppBarTheme(elevation: 0),
         platform: TargetPlatform.iOS),
     home: routes.buildPage('login_page', null), //把他作为默认页面

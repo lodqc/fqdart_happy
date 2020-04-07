@@ -11,6 +11,6 @@ Reducer<LoginState> buildReducer() {
 }
 
 LoginState _onRefrsh(LoginState state, Action action) {
-  final LoginState newState = state.clone()..isEnable = state.phoneController.text.length == 11;
+  final LoginState newState = state.clone();
   return newState;
 }

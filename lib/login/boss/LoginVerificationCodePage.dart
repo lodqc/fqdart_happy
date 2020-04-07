@@ -1,12 +1,15 @@
 import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart' hide Action;
-import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:fluttercmcanyin/login/effect.dart';
 import 'package:fluttercmcanyin/login/reducer.dart';
 import 'package:fluttercmcanyin/login/state.dart';
+import 'package:fluttercmcanyin/weight/CellInput.dart';
+import 'package:toast/toast.dart';
+
+import '../action.dart';
 
 /// 验证码输入页面
-class LoginVerificationCodePage extends Page<LoginState, Map<String, dynamic>> {
+class LoginVerificationCodePage extends Page<LoginState, Map<String, dynamic>>{
   LoginVerificationCodePage()
       : super(
           initState: initState,
@@ -45,20 +48,11 @@ Widget buildView(LoginState state, Dispatch dispatch, ViewService viewService) {
           margin: EdgeInsets.only(left: 30),
         ),
         Container(
-          child: VerificationCode(
-            keyboardType: TextInputType.number,
-            length: 4,
-            itemSize: (MediaQuery.of(viewService.context).size.width - 60)/4,
-            textStyle: TextStyle(
-                fontSize: 22,
-                color: Color(0xff333333),
-                fontWeight: FontWeight.bold),
-            autofocus: true,
-            onCompleted: (String value) {
-              //...
-              print(value);
-            },
-          ),
+          child: CellInput(inputCompleteCallback: (str){
+            Toast.show("1111", viewService.context);
+            state.smscode = str;
+            dispatch(LoginActionCreator.postSnsLogin());
+          },),
           margin: EdgeInsets.only(left: 30,top: 30),
         ),
         Offstage(
@@ -75,3 +69,4 @@ Widget buildView(LoginState state, Dispatch dispatch, ViewService viewService) {
     ),
   );
 }
+

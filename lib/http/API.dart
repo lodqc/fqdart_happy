@@ -3,4 +3,6 @@ class API {
 
   ///发送短信验证码
   static const String SENDSMS = 'user/sendsms';
+  ///登录
+  static const String LOGIN = 'user/login';
 }
