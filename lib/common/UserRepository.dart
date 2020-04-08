@@ -1,23 +1,32 @@
 import 'dart:convert';
 
 import 'package:fluttercmcanyin/bean/user_entity.dart';
+import 'package:fluttercmcanyin/generated/json/base/json_convert_content.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {
   static final UserRepository _singleton = new UserRepository._internal();
   UserData user;
 
+  UserRepository._internal();
 
-
-  factory UserRepository() {
+  static getInstance() {
     return _singleton;
   }
 
-  UserRepository._internal();
-
-  Future<void> setUser(UserData data) async {
+  setUser(UserData data) async {
     user = data;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("user", data.toString());
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString("user", json.encode(data.toJson()));
+  }
+
+  initUser() async {
+    if (user == null) {
+      var prefs = await SharedPreferences.getInstance();
+      var userJson = prefs.getString("user");
+      if (userJson != null) {
+        user = JsonConvert.fromJsonAsT<UserData>(json.decode(userJson));
+      }
+    }
   }
 }

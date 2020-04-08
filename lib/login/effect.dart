@@ -39,7 +39,7 @@ void _postSnsLogin(Action action, Context<LoginState> ctx) async {
     "smscode": ctx.state.smscode
   });
   if (baseBean.code == 0) {
-    UserRepository().setUser(baseBean.data);
+    UserRepository.getInstance().setUser(baseBean.data);
     Navigator.of(ctx.context).pushNamed('home_page');
   } else {
     Toast.show(baseBean.msg, ctx.context);

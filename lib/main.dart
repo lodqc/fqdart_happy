@@ -1,22 +1,13 @@
 import 'dart:io';
 
-import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttercmcanyin/home/HomePage.dart';
-import 'package:fluttercmcanyin/login/boss/LoginBossPage.dart';
-import 'package:fluttercmcanyin/login/boss/LoginVerificationCodePage.dart';
-import 'package:fluttercmcanyin/login/page.dart';
+import 'package:fluttercmcanyin/common/RoutesRepository.dart';
+import 'package:fluttercmcanyin/common/UserRepository.dart';
 
-void main() {
-  final AbstractRoutes routes =
-      PageRoutes(pages: <String, Page<Object, dynamic>>{
-    'login_page': LoginPage(), //在这里添加页面
-    'login_boss_page': LoginBossPage(), //在这里添加页面
-    'login_verificationcode_page': LoginVerificationCodePage(), //在这里添加页面
-    'home_page': HomePage(), //在这里添加页面
-  });
-
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await UserRepository.getInstance().initUser();
   if (Platform.isAndroid) {
     //设置Android头部的导航栏透明
     SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
@@ -24,18 +15,25 @@ void main() {
         statusBarBrightness: Brightness.dark);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   }
-
   runApp(MaterialApp(
     title: 'FishDemo',
     theme: ThemeData(
         primaryColor: Colors.white,
         appBarTheme: new AppBarTheme(elevation: 0),
         platform: TargetPlatform.iOS),
-    home: routes.buildPage('login_page', null), //把他作为默认页面
+    home: RoutesRepository.getInstance().routes.buildPage(getPage(), null), //把他作为默认页面
     onGenerateRoute: (RouteSettings settings) {
       return MaterialPageRoute<Object>(builder: (BuildContext context) {
-        return routes.buildPage(settings.name, settings.arguments);
+        return RoutesRepository.getInstance().routes.buildPage(settings.name, settings.arguments);
       });
     },
   ));
+}
+
+getPage() {
+  if (UserRepository.getInstance().user == null) {
+    return "login_page";
+  } else {
+    return "home_page";
+  }
 }

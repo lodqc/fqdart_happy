@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:fluttercmcanyin/common/UserRepository.dart';
 import 'package:fluttercmcanyin/generated/json/base/json_convert_content.dart';
 import 'package:fluttercmcanyin/http/API.dart';
 import 'package:simple_rc4/simple_rc4.dart';
@@ -50,7 +51,7 @@ class HttpUtil {
         "app_plat": "android",
         "mobile_model": "android9",
         "version": "1.2.2",
-        "token": ""
+        "token": UserRepository.getInstance().user?.token??""
       });
 
       options.data = jsonEncode(options.queryParameters);

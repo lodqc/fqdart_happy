@@ -17,4 +17,22 @@ class UserData with JsonConvert<UserData> {
 	String mobile;
 	@JSONField(name: "avatar_url")
 	String avatarUrl;
+	@override
+	bool operator ==(Object other) =>
+			identical(this, other) ||
+					other is UserData &&
+							runtimeType == other.runtimeType &&
+							token == other.token &&
+							nickName == other.nickName &&
+							accountNum == other.accountNum &&
+							mobile == other.mobile &&
+							avatarUrl == other.avatarUrl;
+
+	@override
+	int get hashCode =>
+			token.hashCode ^
+			nickName.hashCode ^
+			accountNum.hashCode ^
+			mobile.hashCode ^
+			avatarUrl.hashCode;
 }
