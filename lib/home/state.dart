@@ -1,7 +1,7 @@
 import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart';
 
-class HomeState implements Cloneable<HomeState> {
+class HomeState implements Cloneable<HomeState>{
   int currentIndex = 0;
   @override
   HomeState clone() {

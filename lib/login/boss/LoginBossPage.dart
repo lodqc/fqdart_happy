@@ -6,7 +6,7 @@ import 'package:fluttercmcanyin/login/action.dart';
 import 'package:fluttercmcanyin/login/effect.dart';
 import 'package:fluttercmcanyin/login/reducer.dart';
 import 'package:fluttercmcanyin/login/state.dart';
-import 'package:fluttercmcanyin/weight/CommonTextField.dart';
+import 'package:fluttercmcanyin/weight/CommonWeight.dart';
 import 'package:toast/toast.dart';
 
 class LoginBossPage extends Page<LoginState, Map<String, dynamic>> {
@@ -48,7 +48,7 @@ Widget buildView(LoginState state, Dispatch dispatch, ViewService viewService) {
                 padding: EdgeInsets.only(top: 8),
               ),
               Padding(
-                child: UnderlineTextField("请输入手机号", state.phoneController,
+                child: CmUnderlineTextField("请输入手机号", state.phoneController,
                     (value) {
                   dispatch(LoginActionCreator.onRefrsh());
                 },

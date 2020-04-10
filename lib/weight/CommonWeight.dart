@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-TextField UnderlineTextField(String hint, TextEditingController cntroller,
+//公共输入框
+TextField CmUnderlineTextField(String hint, TextEditingController cntroller,
     ValueChanged<String> onChanged,
     {Widget prefixIcon,Widget suffixIcon}) {
   return TextField(
