@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:fluttercmcanyin/common/UserRepository.dart';
 import 'package:fluttercmcanyin/generated/json/base/json_convert_content.dart';
@@ -9,7 +11,7 @@ import 'package:simple_rc4/simple_rc4.dart';
 class HttpUtil {
   static HttpUtil instance;
   Dio dio;
-  BaseOptions options;
+  BaseOptions _options;
 
   CancelToken cancelToken = new CancelToken();
 
@@ -23,7 +25,7 @@ class HttpUtil {
    */
   HttpUtil() {
     //BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
-    options = new BaseOptions(
+    _options = new BaseOptions(
       //请求基地址,可以包含子路径
       baseUrl: API.BASE_URL,
       //连接服务器超时时间，单位是毫秒.
@@ -42,7 +44,7 @@ class HttpUtil {
       responseType: ResponseType.plain,
     );
 
-    dio = new Dio(options);
+    dio = new Dio(_options);
     //添加拦截器
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
@@ -51,7 +53,7 @@ class HttpUtil {
         "app_plat": "android",
         "mobile_model": "android9",
         "version": "1.2.2",
-        "token": UserRepository.getInstance().user?.token??""
+        "token": UserRepository.getInstance().user?.token ?? ""
       });
 
       options.data = jsonEncode(options.queryParameters);
@@ -85,6 +87,20 @@ class HttpUtil {
 //      HttpClient httpClient = new HttpClient(context: sc);
 //      return httpClient;
 //    };
+
+    //抓包代理
+    bool isProxyChecked = true; // a variable for debug
+    String proxy = '10.8.1.147:8888'; // ip:port
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        return isProxyChecked && Platform.isAndroid;
+      };
+      client.findProxy = (url) {
+        return isProxyChecked ? 'PROXY $proxy' : 'DIRECT';
+      };
+    };
   }
 
   /*
@@ -113,11 +129,18 @@ class HttpUtil {
   /*
    * post请求
    */
-  Future<T> post<T>(path, {data, options, cancelToken}) async {
+  Future<T> post<T>(path, {data, options, cancelToken, baseUrl}) async {
     Response response;
     try {
+      var oldBaseUrl = _options.baseUrl;
+      if (baseUrl.isNotEmpty) {
+        _options.baseUrl = baseUrl;
+      }
       response = await dio.post(path,
           queryParameters: data, options: options, cancelToken: cancelToken);
+      if (baseUrl.isNotEmpty) {
+        _options.baseUrl = oldBaseUrl;
+      }
       //解密参数
 //      var decodeString = RC4("2*s&3Hd#kd90").decodeString(response.data, true);
       print("dio--decodeString--=${response.data}");

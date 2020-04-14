@@ -28,6 +28,8 @@ dependencies:
   simple_rc4: ^0.1.6
   fish_redux: ^0.3.1
   shared_preferences: ^0.5.6+3
+  pull_to_refresh: ^1.5.8
+  flutter_swiper: ^1.1.6
 
 dev_dependencies:
   flutter_test:

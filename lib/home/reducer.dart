@@ -1,4 +1,5 @@
 import 'package:fish_redux/fish_redux.dart';
+import 'package:fluttercmcanyin/bean/retail_list_entity_entity.dart';
 
 import 'action.dart';
 import 'state.dart';
@@ -6,13 +7,17 @@ import 'state.dart';
 Reducer<HomeState> buildReducer() {
   return asReducer(
     <Object, Reducer<HomeState>>{
-      HomeAction.onTap: _onTap,
+      HomeAction.postData: _postData,
     },
   );
 }
 
-HomeState _onTap(HomeState state, Action action) {
+HomeState _postData(HomeState state, Action action) {
+  final RetailListEntityData data = action.payload ?? RetailListEntityData();
   final HomeState newState = state.clone();
-  newState.currentIndex = state.currentIndex;
+  newState.data = data;
+  newState.tabs = state.tabs;
+  newState.controller = state.controller;
+  newState.refreshController = state.refreshController;
   return newState;
 }

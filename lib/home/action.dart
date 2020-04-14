@@ -1,13 +1,19 @@
 import 'package:fish_redux/fish_redux.dart';
+import 'package:fluttercmcanyin/bean/retail_list_entity_entity.dart';
 
 //TODO replace with your own action
-enum HomeAction { action, onTap }
+enum HomeAction { postData,onRefresh,onLoading }
 
 class HomeActionCreator {
-  static Action onAction() {
-    return const Action(HomeAction.action);
+  static Action onPostData(RetailListEntityData data) {
+    return Action(HomeAction.postData, payload: data);
   }
-  static Action onTap() {
-    return const Action(HomeAction.onTap);
+
+  static onRefresh() {
+    return Action(HomeAction.postData);
+  }
+
+  static onLoading() {
+    return Action(HomeAction.postData);
   }
 }

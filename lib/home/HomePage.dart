@@ -2,13 +2,14 @@ import 'dart:ui';
 
 import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fluttercmcanyin/bean/retail_list_entity_entity.dart';
 import 'package:fluttercmcanyin/home/action.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'effect.dart';
 import 'reducer.dart';
 import 'state.dart';
 
-class HomePage extends Page<HomeState, Map<String, dynamic>> {
+class HomePage extends Page<HomeState, Map<String, dynamic>> with TickerProviderMixin{
   HomePage()
       : super(
           initState: initState,
@@ -16,14 +17,15 @@ class HomePage extends Page<HomeState, Map<String, dynamic>> {
           reducer: buildReducer(),
           view: buildView,
           dependencies: Dependencies<HomeState>(
-              adapter: null, slots: <String, Dependent<HomeState>>{}),
+              adapter: null, slots: <String, Dependent<HomeState>>{
+          }),
           middleware: <Middleware<HomeState>>[],
         );
 }
 
 Widget buildView(HomeState state, Dispatch dispatch, ViewService viewService) {
   return Scaffold(
-    body: CustomSliverHeaderDemo(),
+    body: getBody(state, dispatch),
     bottomNavigationBar: BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       items: [
@@ -35,254 +37,217 @@ Widget buildView(HomeState state, Dispatch dispatch, ViewService viewService) {
       currentIndex: state.currentIndex,
       onTap: (int index) {
         state.currentIndex = index;
-        dispatch(HomeActionCreator.onTap());
       },
     ),
   );
 }
 
-class CustomSliverHeaderDemo extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
+SafeArea getBody(HomeState state, Dispatch dispatch) {
+  return SafeArea(
+    child: SmartRefresher(
+      controller: state.refreshController,
+      enablePullUp: true,
+      child: CustomScrollView(
         slivers: <Widget>[
-          SliverPersistentHeader(
+          SliverAppBar(
+            title: getTitleWeight(),
+            bottom: TabBar(
+              controller: state.controller,
+              //可以和TabBarView使用同一个TabController
+              tabs: state.tabs,
+              isScrollable: true,
+              indicatorColor: Color(0x00F54D4B),
+              indicatorWeight: 1,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: Color(0xffF54D4B),
+              labelStyle: TextStyle(
+                fontSize: 15.0,
+              ),
+              unselectedLabelColor: Color(0xff999999),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
+            floating: false,
+            expandedHeight: 250,
             pinned: true,
-            delegate: SliverCustomHeaderDelegate(
-                title: '哪吒之魔童降世',
-                collapsedHeight: 40,
-                expandedHeight: 300,
-                paddingTop: MediaQuery.of(context).padding.top,
-                coverImgUrl: 'https://img.zcool.cn/community/01c6615d3ae047a8012187f447cfef.jpg@1280w_1l_2o_100sh.jpg'
-            ),
-          ),
-          SliverFillRemaining(
-            child: FilmContent(),
-          )
-        ],
-      );
-  }
-}
-
-class SliverCustomHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double collapsedHeight;
-  final double expandedHeight;
-  final double paddingTop;
-  final String coverImgUrl;
-  final String title;
-  String statusBarMode = 'dark';
-
-  SliverCustomHeaderDelegate({
-    this.collapsedHeight,
-    this.expandedHeight,
-    this.paddingTop,
-    this.coverImgUrl,
-    this.title,
-  });
-
-  @override
-  double get minExtent => this.collapsedHeight + this.paddingTop;
-
-  @override
-  double get maxExtent => this.expandedHeight;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
-
-  void updateStatusBarBrightness(shrinkOffset) {
-    if(shrinkOffset > 50 && this.statusBarMode == 'dark') {
-      this.statusBarMode = 'light';
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-      ));
-    } else if(shrinkOffset <= 50 && this.statusBarMode == 'light') {
-      this.statusBarMode = 'dark';
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.dark,
-      ));
-    }
-  }
-
-  Color makeStickyHeaderBgColor(shrinkOffset) {
-    final int alpha = (shrinkOffset / (this.maxExtent - this.minExtent) * 255).clamp(0, 255).toInt();
-    return Color.fromARGB(alpha, 255, 255, 255);
-  }
-
-  Color makeStickyHeaderTextColor(shrinkOffset, isIcon) {
-    if(shrinkOffset <= 50) {
-      return isIcon ? Colors.white : Colors.transparent;
-    } else {
-      final int alpha = (shrinkOffset / (this.maxExtent - this.minExtent) * 255).clamp(0, 255).toInt();
-      return Color.fromARGB(alpha, 0, 0, 0);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    this.updateStatusBarBrightness(shrinkOffset);
-    return Container(
-      height: this.maxExtent,
-      width: MediaQuery.of(context).size.width,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Container(child: Image.network(this.coverImgUrl, fit: BoxFit.cover)),
-          Positioned(
-            left: 0,
-            top: this.maxExtent / 2,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x00000000),
-                    Color(0x90000000),
-                  ],
-                ),
+            flexibleSpace: new FlexibleSpaceBar(
+              background: Container(
+                margin: EdgeInsets.only(top: 70, bottom: 30),
+                child:
+                    Image.asset("img/img_banner_ls@3x.png", fit: BoxFit.fill),
               ),
             ),
+            snap: false,
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            child: Container(
-              color: this.makeStickyHeaderBgColor(shrinkOffset),
-              child: SafeArea(
-                bottom: false,
-                child: Container(
-                  height: this.collapsedHeight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(
-                          Icons.arrow_back_ios,
-                          color: this.makeStickyHeaderTextColor(shrinkOffset, true),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      Text(
-                        this.title,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: this.makeStickyHeaderTextColor(shrinkOffset, false),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.share,
-                          color: this.makeStickyHeaderTextColor(shrinkOffset, true),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
+          SliverFixedExtentList(
+            itemExtent: 243,
+            delegate: new SliverChildBuilderDelegate(
+              (context, index) => ConstrainedBox(
+                constraints: BoxConstraints.expand(),
+                child: DecoratedBox(
+                  child: getItem(state.data.shopList.elementAt(index)),
+                  decoration: BoxDecoration(color: Colors.white),
                 ),
               ),
+              childCount: state.data != null && state.data.shopList != null
+                  ? state.data.shopList.length
+                  : 0,
             ),
           ),
         ],
       ),
-    );
-  }
+      header: WaterDropHeader(),
+      onRefresh: () async {
+        dispatch(HomeActionCreator.onRefresh());
+        state.refreshController.refreshCompleted();
+        /*
+      if(failed){
+       _refreshController.refreshFailed();
+      }
+    */
+      },
+      onLoading: () async {
+        dispatch(HomeActionCreator.onLoading());
+//    pageIndex++;
+        state.refreshController.loadComplete();
+      },
+    ),
+  );
 }
 
-class FilmContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(
-                  'https://img1.gamersky.com/image2019/07/20190725_ll_red_136_2/gamersky_07small_14_201972510258D0.jpg',
-                  width: 130,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(left: 16)),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    '哪吒之魔童降世',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Text(
-                    '动画/中国大陆/110分钟',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF999999),
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 2)),
-                  Text(
-                    '2019-07-26 08:00 中国大陆上映',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF999999),
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 2)),
-                  Text(
-                    '32.1万人想看/大V推荐度95%',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF999999),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Divider(height: 32),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                '剧情简介',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF333333),
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(top: 10)),
-              Text(
-                '天地灵气孕育出一颗能量巨大的混元珠，元始天尊将混元珠提炼成灵珠和魔丸，灵珠投胎为人，助周伐纣时可堪大用；而魔丸则会诞出魔王，为祸人间。元始天尊启动了天劫咒语，3年后天雷将会降临，摧毁魔丸。太乙受命将灵珠托生于陈塘关李靖家的儿子哪吒身上。然而阴差阳错，灵珠和魔丸竟然被掉包。本应是灵珠英雄的哪吒却成了混世大魔王。调皮捣蛋顽劣不堪的哪吒却徒有一颗做英雄的心。然而面对众人对魔丸的误解和即将来临的天雷的降临，哪吒是否命中注定会立地成魔？他将何去何从？',
-                textAlign: TextAlign.justify,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFF999999),
-                ),
-              ),
-            ],
-          ),
-        ],
+getItem(RetailListEntityDataShopList bean) {
+  return Stack(
+    children: <Widget>[
+      Positioned(
+        top: 20,
+        left: 14,
+        child: Container(
+          width: 80,
+          height: 80,
+          child: Image.network(bean.logoImg),
+        ),
       ),
-    );
-  }
+      Positioned(
+        top: 20,
+        left: 105,
+        child: Text(
+          bean.shopName,
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff36383A)),
+        ),
+      ),
+      Positioned(
+        top: 50,
+        left: 105,
+        child: Text(
+          "月售${bean.monthSales}",
+          style: TextStyle(fontSize: 12, color: Color(0xff999999)),
+        ),
+      ),
+      Positioned(
+        top: 70,
+        left: 105,
+        child: Text(
+          "起送￥${bean.startDeliveryPrice}",
+          style: TextStyle(fontSize: 12, color: Color(0xff666666)),
+        ),
+      ),
+      Positioned(
+        top: 70,
+        left: 170,
+        child: Text(
+          bean.deliveryCost > 0 ? "配送￥${bean.deliveryCost}" : "免费配送",
+          style: TextStyle(fontSize: 12, color: Color(0xff666666)),
+        ),
+      ),
+      Positioned(
+        top: 36,
+        right: 15,
+        child: Text(
+          "${bean.needTime}分钟",
+          style: TextStyle(fontSize: 12, color: Color(0xff666666)),
+        ),
+      ),
+      Positioned(
+        top: 53,
+        right: 15,
+        child: Text(
+          "${bean.distance}km",
+          style: TextStyle(fontSize: 12, color: Color(0xff999999)),
+        ),
+      ),
+      Container(
+        margin: EdgeInsets.only(left: 106, top: 103),
+        height: 160,
+        child: ListView.builder(
+          itemBuilder: (context, index) => Column(
+            children: <Widget>[
+              Image.network(
+                bean.goodsList.elementAt(index).picture,
+                width: 80,
+                height: 80,
+              ),
+              Text(
+                bean.goodsList.elementAt(index).goodsName,
+                style: TextStyle(fontSize: 12, color: Color(0xff333333)),
+              ),
+              Text(
+                "￥${bean.goodsList.elementAt(index).finalPrice}",
+                style: TextStyle(fontSize: 12, color: Color(0xffFF4D42)),
+              ),
+            ],
+          ),
+          itemCount: bean.goodsList != null ? bean.goodsList.length : 0,
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+        ),
+      ),
+      Container(
+          margin: EdgeInsets.only(top: 242, left: 105),
+          child: Divider(
+            height: 10.0,
+            indent: 0.0,
+            color: Color(0xffEEEEEE),
+          ))
+    ],
+  );
+}
+
+getTitleWeight() {
+  return Row(
+    children: <Widget>[
+      IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {},
+      ),
+      Container(
+        width: 15,
+        height: 15,
+        margin: EdgeInsets.only(left: 10, right: 4.5, top: 2),
+        child: Image(
+          image: AssetImage("img/icon_positioning@3x.png"),
+        ),
+      ),
+      Text(
+        "花园城(蛇口美年广场)",
+        style: TextStyle(
+            fontSize: 19,
+            color: Color(0xff030303),
+            fontWeight: FontWeight.bold),
+      ),
+      Container(
+        width: 15,
+        height: 15,
+        margin: EdgeInsets.only(left: 9, top: 2),
+        child: Image(
+          image: AssetImage("img/icon_arrow_wm@3x.png"),
+        ),
+      ),
+    ],
+  );
 }
 
 BottomNavigationBarItem getUnselctItem(HomeState state, int index) {
