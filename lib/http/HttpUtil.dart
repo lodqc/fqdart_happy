@@ -129,7 +129,7 @@ class HttpUtil {
   /*
    * post请求
    */
-  Future<T> post<T>(path, {data, options, cancelToken, baseUrl}) async {
+  Future<T> post<T>(path, {data, options, cancelToken,String baseUrl  = ""}) async {
     Response response;
     try {
       var oldBaseUrl = _options.baseUrl;

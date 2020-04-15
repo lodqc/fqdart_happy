@@ -38,6 +38,7 @@ _onInit(Action action, Context<HomeState> ctx) async {
 
 _onRefresh(Action action, Context<HomeState> ctx) async {
   ctx.state.page = 1;
+  ctx.state.data = null;
   await getData(ctx);
 }
 
@@ -46,7 +47,7 @@ _onLoading(Action action, Context<HomeState> ctx) async {
   await getData(ctx);
 }
 
-Future getData(Context<HomeState> ctx) async {
+Future getData(Context<HomeState> ctx,{bool isFefresh = true}) async {
   var bean = await HttpUtil.getInstance().post<RetailListEntityEntity>(
       API.GET_SHOP_LIST_NEW,
       baseUrl: API.BASE_RETAIL_URL,
@@ -61,7 +62,19 @@ Future getData(Context<HomeState> ctx) async {
       });
   if (bean.code == 0) {
     ctx.dispatch(HomeActionCreator.onPostData(bean.data));
+    if(isFefresh){
+      ctx.state.refreshController.refreshCompleted();
+    }else{
+      ctx.state.refreshController.loadComplete();
+    }
+
   } else {
     Toast.show(bean.msg, ctx.context);
+    if(isFefresh){
+      ctx.state.refreshController.refreshFailed();
+    }else{
+      ctx.state.refreshController.loadFailed();
+    }
+
   }
 }

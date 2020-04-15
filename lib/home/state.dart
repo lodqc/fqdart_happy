@@ -7,17 +7,22 @@ class HomeState implements Cloneable<HomeState> {
   int currentIndex = 0;
   int page = 1;
   var tabs;
-  RetailListEntityData data;
   TabController controller;
+  RetailListEntityData data;
   RefreshController refreshController =
       RefreshController(initialRefresh: false);
 
   @override
   HomeState clone() {
     return HomeState()
-      ..page
-      ..currentIndex;
+      ..currentIndex = currentIndex
+      ..page = page
+      ..tabs = tabs
+      ..data = data
+      ..controller = controller
+      ..refreshController = refreshController;
   }
+
 }
 
 HomeState initState(Map<String, dynamic> args) {

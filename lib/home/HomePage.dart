@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fish_redux/fish_redux.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercmcanyin/bean/retail_list_entity_entity.dart';
 import 'package:fluttercmcanyin/home/action.dart';
@@ -9,7 +10,8 @@ import 'effect.dart';
 import 'reducer.dart';
 import 'state.dart';
 
-class HomePage extends Page<HomeState, Map<String, dynamic>> with TickerProviderMixin{
+class HomePage extends Page<HomeState, Map<String, dynamic>>
+    with TickerProviderMixin {
   HomePage()
       : super(
           initState: initState,
@@ -17,8 +19,7 @@ class HomePage extends Page<HomeState, Map<String, dynamic>> with TickerProvider
           reducer: buildReducer(),
           view: buildView,
           dependencies: Dependencies<HomeState>(
-              adapter: null, slots: <String, Dependent<HomeState>>{
-          }),
+              adapter: null, slots: <String, Dependent<HomeState>>{}),
           middleware: <Middleware<HomeState>>[],
         );
 }
@@ -42,77 +43,68 @@ Widget buildView(HomeState state, Dispatch dispatch, ViewService viewService) {
   );
 }
 
-SafeArea getBody(HomeState state, Dispatch dispatch) {
-  return SafeArea(
-    child: SmartRefresher(
-      controller: state.refreshController,
-      enablePullUp: true,
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            title: getTitleWeight(),
-            bottom: TabBar(
-              controller: state.controller,
-              //可以和TabBarView使用同一个TabController
-              tabs: state.tabs,
-              isScrollable: true,
-              indicatorColor: Color(0x00F54D4B),
-              indicatorWeight: 1,
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Color(0xffF54D4B),
-              labelStyle: TextStyle(
-                fontSize: 15.0,
-              ),
-              unselectedLabelColor: Color(0xff999999),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 12.0,
-              ),
+Widget getBody(HomeState state, Dispatch dispatch) {
+  return SmartRefresher(
+    controller: state.refreshController,
+    enablePullUp: true,
+    child: CustomScrollView(
+      slivers: <Widget>[
+        SliverAppBar(
+          title: getTitleWeight(),
+          elevation: 0,
+          bottom: TabBar(
+            controller: state.controller,
+            //可以和TabBarView使用同一个TabController
+            tabs: state.tabs,
+            isScrollable: true,
+            indicatorColor: Color(0x00F54D4B),
+            indicatorWeight: 1,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: Color(0xffF54D4B),
+            labelStyle: TextStyle(
+              fontSize: 15.0,
             ),
-            floating: false,
-            expandedHeight: 250,
-            pinned: true,
-            flexibleSpace: new FlexibleSpaceBar(
-              background: Container(
-                margin: EdgeInsets.only(top: 70, bottom: 30),
-                child:
-                    Image.asset("img/img_banner_ls@3x.png", fit: BoxFit.fill),
-              ),
-            ),
-            snap: false,
-          ),
-          SliverFixedExtentList(
-            itemExtent: 243,
-            delegate: new SliverChildBuilderDelegate(
-              (context, index) => ConstrainedBox(
-                constraints: BoxConstraints.expand(),
-                child: DecoratedBox(
-                  child: getItem(state.data.shopList.elementAt(index)),
-                  decoration: BoxDecoration(color: Colors.white),
-                ),
-              ),
-              childCount: state.data != null && state.data.shopList != null
-                  ? state.data.shopList.length
-                  : 0,
+            unselectedLabelColor: Color(0xff999999),
+            unselectedLabelStyle: TextStyle(
+              fontSize: 12.0,
             ),
           ),
-        ],
-      ),
-      header: WaterDropHeader(),
-      onRefresh: () async {
-        dispatch(HomeActionCreator.onRefresh());
-        state.refreshController.refreshCompleted();
-        /*
-      if(failed){
-       _refreshController.refreshFailed();
-      }
-    */
-      },
-      onLoading: () async {
-        dispatch(HomeActionCreator.onLoading());
-//    pageIndex++;
-        state.refreshController.loadComplete();
-      },
+          floating: false,
+          expandedHeight: 250,
+          pinned: true,
+          flexibleSpace: new FlexibleSpaceBar(
+            background: Container(
+              margin: EdgeInsets.only(top: 70, bottom: 30),
+              child: Image.asset("img/img_banner_ls@3x.png", fit: BoxFit.fill),
+            ),
+          ),
+          snap: false,
+        ),
+        SliverList(
+          delegate: new SliverChildBuilderDelegate(
+            (context, index) => Container(
+              child: getItem(state.data.shopList.elementAt(index)),
+              decoration: BoxDecoration(color: Colors.white),
+              height: (state.data.shopList.elementAt(index).goodsList != null &&
+                      state.data.shopList.elementAt(index).goodsList.length > 0)
+                  ? 243
+                  : 111,
+            ),
+            childCount: state.data != null && state.data.shopList != null
+                ? state.data.shopList.length
+                : 0,
+          ),
+        ),
+      ],
     ),
+    header: MaterialClassicHeader(color: Colors.red,),
+    onRefresh: () {
+      dispatch(HomeActionCreator.onRefresh());
+    },
+    onLoading: () {
+      dispatch(HomeActionCreator.onLoading());
+      state.refreshController.loadComplete();
+    },
   );
 }
 
@@ -179,36 +171,40 @@ getItem(RetailListEntityDataShopList bean) {
           style: TextStyle(fontSize: 12, color: Color(0xff999999)),
         ),
       ),
-      Container(
-        margin: EdgeInsets.only(left: 106, top: 103),
-        height: 160,
-        child: ListView.builder(
-          itemBuilder: (context, index) => Column(
-            children: <Widget>[
-              Image.network(
-                bean.goodsList.elementAt(index).picture,
-                width: 80,
-                height: 80,
-              ),
-              Text(
-                bean.goodsList.elementAt(index).goodsName,
-                style: TextStyle(fontSize: 12, color: Color(0xff333333)),
-              ),
-              Text(
-                "￥${bean.goodsList.elementAt(index).finalPrice}",
-                style: TextStyle(fontSize: 12, color: Color(0xffFF4D42)),
-              ),
-            ],
+      Offstage(
+        offstage: bean.goodsList == null,
+        child: Container(
+          margin: EdgeInsets.only(left: 105, top: 103),
+          height: 160,
+          child: ListView.builder(
+            itemBuilder: (context, index) => Column(
+              children: <Widget>[
+                Image.network(
+                  bean.goodsList.elementAt(index).picture,
+                  width: 80,
+                  height: 80,
+                ),
+                Text(
+                  bean.goodsList.elementAt(index).goodsName,
+                  style: TextStyle(fontSize: 12, color: Color(0xff333333)),
+                ),
+                Text(
+                  "￥${bean.goodsList.elementAt(index).finalPrice}",
+                  style: TextStyle(fontSize: 12, color: Color(0xffFF4D42)),
+                ),
+              ],
+            ),
+            itemCount: bean.goodsList.length,
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
           ),
-          itemCount: bean.goodsList != null ? bean.goodsList.length : 0,
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
         ),
       ),
       Container(
-          margin: EdgeInsets.only(top: 242, left: 105),
+          margin: EdgeInsets.only(
+              top: bean.goodsList.isEmpty ? 110 : 242, left: 105),
           child: Divider(
-            height: 10.0,
+            height: 1,
             indent: 0.0,
             color: Color(0xffEEEEEE),
           ))

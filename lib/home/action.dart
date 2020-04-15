@@ -10,10 +10,10 @@ class HomeActionCreator {
   }
 
   static onRefresh() {
-    return Action(HomeAction.postData);
+    return Action(HomeAction.onRefresh);
   }
 
   static onLoading() {
-    return Action(HomeAction.postData);
+    return Action(HomeAction.onLoading);
   }
 }

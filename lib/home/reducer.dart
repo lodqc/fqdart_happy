@@ -15,9 +15,10 @@ Reducer<HomeState> buildReducer() {
 HomeState _postData(HomeState state, Action action) {
   final RetailListEntityData data = action.payload ?? RetailListEntityData();
   final HomeState newState = state.clone();
-  newState.data = data;
-  newState.tabs = state.tabs;
-  newState.controller = state.controller;
-  newState.refreshController = state.refreshController;
+  if(newState.data == null||newState.data.shopList == null){
+    newState.data = data;
+  }else{
+    newState.data.shopList.addAll(data.shopList);
+  }
   return newState;
 }
