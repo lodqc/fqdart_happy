@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flare_splash_screen/flare_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
@@ -45,9 +46,13 @@ Future<void> main() async {
           primaryColor: Colors.white,
           appBarTheme: new AppBarTheme(elevation: 0),
           platform: TargetPlatform.iOS),
-      home: RoutesRepository.getInstance()
-          .routes
-          .buildPage(getPage(), null), //把他作为默认页面
+      home: SplashScreen.navigate(
+        name: 'intro.flr',
+        next: (_) =>
+            RoutesRepository.getInstance().routes.buildPage(getPage(), null),
+        until: () => Future.delayed(Duration(seconds: 3)),
+        startAnimation: '1',
+      ), //把他作为默认页面
       onGenerateRoute: (RouteSettings settings) {
         return MaterialPageRoute<Object>(builder: (BuildContext context) {
           return RoutesRepository.getInstance()

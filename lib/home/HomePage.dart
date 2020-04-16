@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercmcanyin/bean/retail_list_entity_entity.dart';
 import 'package:fluttercmcanyin/home/action.dart';
+import 'package:fluttercmcanyin/weight/WebViewExample.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'effect.dart';
 import 'reducer.dart';
@@ -38,12 +39,34 @@ Widget buildView(HomeState state, Dispatch dispatch, ViewService viewService) {
       currentIndex: state.currentIndex,
       onTap: (int index) {
         state.currentIndex = index;
+        dispatch(HomeActionCreator.onTap());
       },
     ),
   );
 }
 
 Widget getBody(HomeState state, Dispatch dispatch) {
+  Widget body;
+  switch (state.currentIndex) {
+    case 1:
+      {
+        body = getSubscribeWeight(state, dispatch);
+        break;
+      }
+    default:
+      {
+        body = getHomeWeight(state, dispatch);
+        break;
+      }
+  }
+  return body;
+}
+
+Widget getSubscribeWeight(HomeState state, dispatch) {
+  return WebViewExample();
+}
+
+SmartRefresher getHomeWeight(HomeState state, Dispatch dispatch) {
   return SmartRefresher(
     controller: state.refreshController,
     enablePullUp: true,
@@ -97,7 +120,9 @@ Widget getBody(HomeState state, Dispatch dispatch) {
         ),
       ],
     ),
-    header: MaterialClassicHeader(color: Colors.red,),
+    header: MaterialClassicHeader(
+      color: Colors.red,
+    ),
     onRefresh: () {
       dispatch(HomeActionCreator.onRefresh());
     },

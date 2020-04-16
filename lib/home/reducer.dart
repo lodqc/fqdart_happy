@@ -8,6 +8,7 @@ Reducer<HomeState> buildReducer() {
   return asReducer(
     <Object, Reducer<HomeState>>{
       HomeAction.postData: _postData,
+      HomeAction.onTap: _onTap,
     },
   );
 }
@@ -15,10 +16,15 @@ Reducer<HomeState> buildReducer() {
 HomeState _postData(HomeState state, Action action) {
   final RetailListEntityData data = action.payload ?? RetailListEntityData();
   final HomeState newState = state.clone();
-  if(newState.data == null||newState.data.shopList == null){
+  if (newState.data == null || newState.data.shopList == null) {
     newState.data = data;
-  }else{
+  } else {
     newState.data.shopList.addAll(data.shopList);
   }
+  return newState;
+}
+
+HomeState _onTap(HomeState state, Action action) {
+  final HomeState newState = state.clone();
   return newState;
 }
